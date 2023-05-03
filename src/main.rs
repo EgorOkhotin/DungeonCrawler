@@ -38,7 +38,11 @@ fn main() -> BError {
         .with_dimensions(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         .with_tile_dimensions(TEXTURE_TILE_DIMENSION, TEXTURE_TILE_DIMENSION)
         .with_resource_path("resources/")
-        .with_font("dungeonfont.png", TEXTURE_TILE_DIMENSION, TEXTURE_TILE_DIMENSION)
+        .with_font(
+            "dungeonfont.png",
+            TEXTURE_TILE_DIMENSION,
+            TEXTURE_TILE_DIMENSION,
+        )
         .with_font("terminal8x8.png", UI_TILE_DIMENSION, UI_TILE_DIMENSION)
         .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
@@ -64,16 +68,15 @@ impl State {
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
         let player_position = map_builder.player_start;
-
         spawn_player(&mut world, player_position);
         spawn_amulet_of_yala(&mut world, map_builder.amulet_start);
 
         map_builder
-            .rooms
+            .monster_spawns
             .iter()
-            .skip(1)
-            .map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut world, &mut rng, pos));
+            //.skip(1)
+            //.map(|r| r.center())
+            .for_each(|pos| spawn_monster(&mut world, &mut rng, *pos));
 
         resources.insert(map_builder.map);
         resources.insert(Camera::new(player_position));
@@ -155,11 +158,11 @@ play again.",
         spawn_player(&mut self.ecs, map_builder.player_start);
         spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
         map_builder
-            .rooms
+            .monster_spawns
             .iter()
-            .skip(1)
-            .map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, pos));
+            //.skip(1)
+            //.map(|r| r.center())
+            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
