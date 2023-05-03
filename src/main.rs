@@ -23,8 +23,8 @@ mod prelude {
 
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
-    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
-    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
+    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 4;
+    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 4;
 
     pub const TEXTURE_TILE_DIMENSION: i32 = 32;
     pub const UI_TILE_DIMENSION: i32 = 8;
@@ -35,14 +35,14 @@ fn main() -> BError {
     let context = BTermBuilder::new()
         .with_title("Dungeon crawl master")
         .with_fps_cap(30.0)
-        .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        .with_dimensions(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         .with_tile_dimensions(TEXTURE_TILE_DIMENSION, TEXTURE_TILE_DIMENSION)
         .with_resource_path("resources/")
         .with_font("dungeonfont.png", TEXTURE_TILE_DIMENSION, TEXTURE_TILE_DIMENSION)
         .with_font("terminal8x8.png", UI_TILE_DIMENSION, UI_TILE_DIMENSION)
         .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
         .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
-        .with_simple_console_no_bg(SCREEN_HEIGHT * 2, SCREEN_HEIGHT * 2, "terminal8x8.png")
+        .with_simple_console_no_bg(SCREEN_WIDTH, SCREEN_HEIGHT, "terminal8x8.png")
         .build()?;
 
     main_loop(context, State::new())
