@@ -76,7 +76,7 @@ impl State {
             .iter()
             //.skip(1)
             //.map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut world, &mut rng, *pos));
+            .for_each(|pos| spawn_entity(&mut world, &mut rng, *pos));
 
         resources.insert(map_builder.map);
         resources.insert(Camera::new(player_position));
@@ -163,7 +163,7 @@ play again.",
             .iter()
             //.skip(1)
             //.map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
+            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
