@@ -9,9 +9,6 @@ pub struct Render {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Player;
-
-#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Enemy;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -46,7 +43,7 @@ pub struct Item;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct ProvidesHealing {
-    pub amount: i32
+    pub amount: i32,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -57,12 +54,17 @@ pub struct Carried(pub Entity);
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ActivateItem {
-pub used_by : Entity,
-pub item : Entity
+    pub used_by: Entity,
+    pub item: Entity,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct AmuletOfYala;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Player {
+    pub map_level: u32,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldOfView {
