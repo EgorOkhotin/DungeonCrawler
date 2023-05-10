@@ -13,8 +13,10 @@ pub fn player_input(
     #[resource] key: &Option<VirtualKeyCode>,
     #[resource] turn_state: &mut TurnState,
 ) {
-    if let Some(key) = key {
-        let mut players = <(Entity, &Point)>::query().filter(component::<Player>());
+    let mut players = <(Entity, &Point)>::query().filter(component::<Player>());
+    let mut enemies = <(Entity, &Point)>::query().filter(component::<Enemy>());
+
+    if let Some(key) = *key {
         let delta = match key {
             VirtualKeyCode::Left => Point::new(-1, 0),
             VirtualKeyCode::Right => Point::new(1, 0),
@@ -25,16 +27,28 @@ pub fn player_input(
                     .iter(ecs)
                     .find_map(|(entity, pos)| Some((*entity, *pos)))
                     .unwrap();
+
                 let mut items = <(Entity, &Item, &Point)>::query();
-                items
-                    .iter(ecs)
+                items.iter(ecs)
                     .filter(|(_entity, _item, &item_pos)| item_pos == player_pos)
                     .for_each(|(entity, _item, _item_pos)| {
                         commands.remove_component::<Point>(*entity);
                         commands.add_component(*entity, Carried(player));
-                    });
+
+                        if let Ok(e) = ecs.entry_ref(*entity) {
+                            if e.get_component::<Weapon>().is_ok() {
+                                <(Entity, &Carried, &Weapon)>::query()
+                                .iter(ecs)
+                                .filter(|(_, c, _)| c.0 == player)
+                                .for_each(|(e, c, w)| {
+                                    commands.remove(*e);
+                                })
+                            }
+                        }
+                    }
+                );
                 Point::new(0, 0)
-            }
+            },
             VirtualKeyCode::Key1 => use_item(0, ecs, commands),
             VirtualKeyCode::Key2 => use_item(1, ecs, commands),
             VirtualKeyCode::Key3 => use_item(2, ecs, commands),
@@ -44,49 +58,43 @@ pub fn player_input(
             VirtualKeyCode::Key7 => use_item(6, ecs, commands),
             VirtualKeyCode::Key8 => use_item(7, ecs, commands),
             VirtualKeyCode::Key9 => use_item(8, ecs, commands),
-
             _ => Point::new(0, 0),
         };
 
         let (player_entity, destination) = players
-            .iter(ecs)
-            .find_map(|(entity, pos)| Some((*entity, *pos + delta)))
-            .unwrap();
+                .iter(ecs)
+                .find_map(|(entity, pos)| Some((*entity, *pos + delta)) )
+                .unwrap();
 
-        let mut enemies = <(Entity, &Point)>::query().filter(component::<Enemy>());
+        let mut did_something = false;
+        if delta.x !=0 || delta.y != 0 {
 
         let mut hit_something = false;
-        let mut did_something = false;
+        enemies
+            .iter(ecs)
+            .filter(|(_, pos)| {
+                **pos == destination
+            })
+            .for_each(|(entity, _) | {
+                hit_something = true;
+                did_something = true;
 
-        if delta.x != 0 || delta.y != 0 {
-            enemies
-                .iter(ecs)
-                .filter(|(_, pos)| **pos == destination)
-                .for_each(|(entity, _)| {
-                    hit_something = true;
-                    did_something = true;
-
-                    commands.push((
-                        (),
-                        WantsToAttack {
-                            attacker: player_entity,
-                            victim: *entity,
-                        },
-                    ));
-                });
+                commands
+                    .push(((), WantsToAttack{
+                        attacker: player_entity,
+                        victim: *entity,
+                    }));
+            });
 
             if !hit_something {
                 did_something = true;
-                commands.push((
-                    (),
-                    WantsToMove {
+                commands
+                    .push(((), WantsToMove{
                         entity: player_entity,
-                        destination,
-                    },
-                ));
+                        destination
+                    }));
             }
-        }
-
+        };
         *turn_state = TurnState::PlayerTurn;
     }
 }

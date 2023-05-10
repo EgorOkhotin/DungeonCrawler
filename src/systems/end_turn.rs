@@ -8,7 +8,7 @@ pub fn end_turn(ecs: &SubWorld, #[resource] map: &Map, #[resource] turn_state: &
     let mut player_hp = <(&Health, &Point)>::query().filter(component::<Player>());
     let mut amulet = <&Point>::query().filter(component::<AmuletOfYala>());
     let amulet_default = Point::new(-1, -1);
-    let amulet_pos = amulet.iter(ecs).nth(0).unwrap_or(&amulet_default);
+    let amulet_pos = amulet.iter(ecs).next().unwrap_or(&amulet_default);
 
     let current_state = turn_state.clone();
 
